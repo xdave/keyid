@@ -3,7 +3,7 @@
 Uses the Camelot system to either:
 
 - suggest the next track (based on your current Master deck)
-  - Rekordbox takes 60 seconds (by default) to add the Master deck track to your history
+  - Rekordbox takes 60 seconds (by default) to add the Master deck track to your history. See [here](https://assets-global.website-files.com/624b7d52289aa4ed9d117a25/6395995aaa7b424b012bfea7_Screen%20Shot%202022-12-11%20at%2012.47.54%20AM.png) for how to change this setting
 - generate a new playlist from the given playlist name (or your whole collection) with the selections in a compatible key and tempo.
 
 This assumes you have analyzed your collection using the Alphanumeric key notation.
@@ -25,3 +25,8 @@ This assumes you have analyzed your collection using the Alphanumeric key notati
 # Build instructions for Windows
 
 - [TODO]
+
+# Roadmap
+
+- Multiplatform downloadable builds
+- Generate .m3u playlists in `generate` mode
