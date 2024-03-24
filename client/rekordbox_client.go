@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/xdave/keyid/args"
 	"github.com/xdave/keyid/interfaces"
@@ -76,6 +77,19 @@ func (c *RekordboxClient) LoadPlaylist(name string) interfaces.Collection {
 	return models.NewInMemoryCollection(tracks...)
 }
 
+func (c *RekordboxClient) GetTrackByTitle(pattern string, from interfaces.Collection) interfaces.Item {
+	for _, track := range from.Items() {
+		if strings.Contains(track.GetTitle(), pattern) {
+			return track
+		}
+	}
+
+	err := fmt.Sprintf("Error: cannot find a track with '%s' in the name", c.args.StartWith)
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
+	return nil
+}
+
 func (c *RekordboxClient) GetNowPlaying() interfaces.Item {
 	songHistories, _ := c.client.RecentDjmdSongHistory(context.Background(), 1)
 	if len(songHistories) == 0 {
@@ -128,14 +142,13 @@ func (c *RekordboxClient) Suggest(collection interfaces.Collection) {
 }
 
 func (c *RekordboxClient) Generate(collection interfaces.Collection) {
-	startWith := collection.First()
+	startWith := c.GetTrackByTitle(c.args.StartWith, collection)
 	playlist := models.NewInMemoryCollection(startWith)
 
 	var lastTrack interfaces.Item
 
 	for {
-		i := playlist.Len() - 1
-		lastTrack = playlist.Get(i)
+		lastTrack = playlist.Last()
 
 		compatible := c.GetCompatibleTracks(lastTrack, collection)
 		if compatible.IsEmpty() || playlist.Len() == collection.Len() {
