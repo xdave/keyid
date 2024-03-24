@@ -79,7 +79,7 @@ func (c *RekordboxClient) LoadPlaylist(name string) interfaces.Collection {
 
 func (c *RekordboxClient) GetTrackByTitle(pattern string, from interfaces.Collection) interfaces.Item {
 	for _, track := range from.Items() {
-		if strings.Contains(track.GetTitle(), pattern) {
+		if strings.Contains(strings.ToLower(track.GetTitle()), strings.ToLower(pattern)) {
 			return track
 		}
 	}
