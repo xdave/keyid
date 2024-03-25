@@ -57,7 +57,8 @@ Usage of ./keyid:
   -playlist string
         Name of Rekordbox Playlist to use (uses whole collection by default)
   -startWith string
-        Some part of the Track Title to start with in 'generate' mode (otherwise starts with first track in provided 'playlist')
+        Some part of the Track Title to start with in 'generate' mode (otherwise
+        starts with first track in provided 'playlist')
 ```
 
 ## Examples
