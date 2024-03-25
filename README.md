@@ -27,6 +27,7 @@ This assumes you have analyzed your collection using the Alphanumeric key notati
 
 - clone this repo: `git clone https://github.com/xdave/keyid.git`
 - switch to it's directory: `cd keyid`
+- install build dependencies: `go get`
 - build the app: `go build .`
 - run the app: `./keyid --help` with the `--help` to get usage instructions
 
