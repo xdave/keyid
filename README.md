@@ -46,6 +46,10 @@ This assumes you have analyzed your collection using the Alphanumeric key notati
 
 - [TODO]
 
+# Linux
+
+- At the moment, only the platforms upon which Rekordbox is supported work (Windows, Mac)
+
 # Usage
 
 ```
@@ -92,3 +96,4 @@ Usage of ./keyid:
 - Multiplatform downloadable builds
 - Generate .m3u playlists in `generate` mode
 - Better documentation
+- Support for other DJ Software (Serato, Virtual DJ, Engine DJ, Mixxx, etc)
