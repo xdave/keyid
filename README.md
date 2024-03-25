@@ -93,7 +93,7 @@ Usage of ./keyid:
 
 # Roadmap
 
-- Multiplatform downloadable builds
-- Generate .m3u playlists in `generate` mode
-- Better documentation
-- Support for other DJ Software (Serato, Virtual DJ, Engine DJ, Mixxx, etc)
+- [ ] Generate .m3u playlists in `generate` mode
+- [ ] Multiplatform downloadable builds
+- [ ] Support for other DJ Software (Serato, Virtual DJ, Engine DJ, Mixxx, etc)
+- [ ] Better documentation
