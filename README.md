@@ -83,6 +83,10 @@ Usage of ./keyid:
 
 - NOTE: You must provide a track to start with from your source playlist.
 
+# Do you _really_ use this?
+
+- Yes, [I do](https://soundcloud.com/davidgradwell/sets/gradwell-radio). I used do to do this manually in my head.
+
 # Roadmap
 
 - Multiplatform downloadable builds
