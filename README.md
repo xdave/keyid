@@ -29,7 +29,7 @@ This assumes you have analyzed your collection using the Alphanumeric key notati
 - switch to it's directory: `cd keyid`
 - install build dependencies: `go get`
 - build the app: `go build .`
-- run the app: `./keyid --help` with the `--help` to get usage instructions
+- run the app: `./keyid --help` (with `--help` to get usage instructions)
 
 # Build instructions for Windows
 
