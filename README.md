@@ -8,6 +8,11 @@ Uses the Camelot system to either:
 
 This assumes you have analyzed your collection using the Alphanumeric key notation.
 
+# Why
+
+- Q: Rekordbox already has a "Traffic Light" system that can suggest tracks to play that are in key, why do this?
+- A: It sucks, and this program has a better set of rules that finds stuff that works more harmonically.
+
 # Prerequisites
 
 - Install [rekordbox](https://rekordbox.com/en/)
@@ -40,6 +45,42 @@ This assumes you have analyzed your collection using the Alphanumeric key notati
 ## Build
 
 - [TODO]
+
+# Usage
+
+```
+Usage of ./keyid:
+  -debug
+        Enable debug logging
+  -mode string
+        One of 'suggest' or 'generate' (default "suggest")
+  -playlist string
+        Name of Rekordbox Playlist to use (uses whole collection by default)
+  -startWith string
+        Some part of the Track Title to start with in 'generate' mode (otherwise starts with first track in provided 'playlist')
+```
+
+## Examples
+
+- To suggest the next track based on what you're currently playing (lists all compatible tracks from your collection):
+
+```
+./keyid
+```
+
+- To use an existing playlist for the pool of tracks to find:
+
+```
+./keyid -playlist 'My Cool Playlist 2024'
+```
+
+- To generate a new playlist based on your whole collection (also accepts `-playlist`):
+
+```
+./keyid -mode generate -playlist 'My Cool Playlist 2024' -startWith 'Cafe Del Mar'
+```
+
+- NOTE: You must provide a track to start with from your source playlist.
 
 # Roadmap
 
