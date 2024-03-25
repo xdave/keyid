@@ -12,6 +12,7 @@ import (
 type Mediator struct {
 	notifications        interfaces.NotificationChannel
 	notificationHandlers []interfaces.NotificationHandler
+	running              bool
 }
 
 type MediatorParams struct {
@@ -34,7 +35,15 @@ func NewMediator(params MediatorParams) MediatorResult {
 
 	params.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			mediator.running = true
 			go mediator.HandleNotifications()
+			return nil
+		},
+	})
+
+	params.Lifecycle.Append(fx.Hook{
+		OnStop: func(ctx context.Context) error {
+			mediator.running = false
 			return nil
 		},
 	})
@@ -43,7 +52,7 @@ func NewMediator(params MediatorParams) MediatorResult {
 }
 
 func (m *Mediator) HandleNotifications() {
-	for {
+	for m.running {
 		notification := m.notifications.Receive()
 		for _, handler := range m.notificationHandlers {
 			if notification != nil && notification.GetType() == handler.GetType() {

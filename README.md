@@ -79,13 +79,21 @@ Usage of ./keyid:
 ./keyid -playlist 'My Cool Playlist 2024'
 ```
 
+- You can also suggest based on the name of a track you want, instead of the one that's playing
+
+```
+./keyid -playlist 'My Cool Playlist 2024' -startWith 'Cafe Del Mar
+```
+
 - To generate a new playlist based on your whole collection (also accepts `-playlist`):
 
 ```
 ./keyid -mode generate -playlist 'My Cool Playlist 2024' -startWith 'Cafe Del Mar'
 ```
 
-- NOTE: You must provide a track to start with from your source playlist.
+- NOTE: You must provide a track to start with from your source playlist when in `generate` mode.
+- NOTE: Track printout has 4 columns, BPM, Key, Energy, and Artist+Title, for example:
+  - `122 10A     6       Serious Dancers - In The Beginning (Hernan Cattaneo & Simply City Remix)`
 
 # Do you _really_ use this?
 

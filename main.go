@@ -18,9 +18,6 @@ func main() {
 		logger.GetLogger(),
 		args.Module,
 		app.Module,
-		fx.Invoke(func(c interfaces.Client) {
-			c.Run()
-			defer c.Close()
-		}),
+		fx.Invoke(interfaces.Client.Run),
 	).Run()
 }

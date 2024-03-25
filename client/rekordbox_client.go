@@ -21,10 +21,13 @@ type RekordboxClient struct {
 	optionsResolver *RekordboxOptionsResolver
 	history         *RekordboxHistory
 	args            *args.Args
+	shutdowner      fx.Shutdowner
 }
 
 type RekordboxClientParams struct {
 	fx.In
+	fx.Lifecycle
+	fx.Shutdowner
 	OptionsResolver *RekordboxOptionsResolver
 	History         *RekordboxHistory
 	Args            *args.Args
@@ -43,13 +46,23 @@ func NewRekordboxClient(params RekordboxClientParams) RekordboxClientResult {
 		panic(err)
 	}
 
-	return RekordboxClientResult{
-		Client: &RekordboxClient{
-			client:          client,
-			optionsResolver: params.OptionsResolver,
-			history:         params.History,
-			args:            params.Args,
+	rbClient := &RekordboxClient{
+		client:          client,
+		optionsResolver: params.OptionsResolver,
+		history:         params.History,
+		args:            params.Args,
+		shutdowner:      params.Shutdowner,
+	}
+
+	params.Lifecycle.Append(fx.Hook{
+		OnStop: func(ctx context.Context) error {
+			rbClient.Close()
+			return nil
 		},
+	})
+
+	return RekordboxClientResult{
+		Client: rbClient,
 	}
 }
 
@@ -63,6 +76,11 @@ func (c *RekordboxClient) LoadPlaylist(name string) interfaces.Collection {
 		}
 	} else {
 		playlists, _ := c.client.DjmdPlaylistByName(context.Background(), nulltype.NullStringOf(name))
+		if len(playlists) == 0 {
+			err := fmt.Sprintf("Error: cannot find a playlist with name '%s'", name)
+			fmt.Fprintln(os.Stderr, err)
+			return nil
+		}
 		playlist := playlists[0]
 		playlistSongs, _ := c.client.DjmdSongPlaylistByPlaylistID(context.Background(), playlist.ID)
 		sort.Slice(playlistSongs, func(i, j int) bool {
@@ -86,11 +104,14 @@ func (c *RekordboxClient) GetTrackByTitle(pattern string, from interfaces.Collec
 
 	err := fmt.Sprintf("Error: cannot find a track with '%s' in the name", c.args.StartWith)
 	fmt.Fprintln(os.Stderr, err)
-	os.Exit(1)
 	return nil
 }
 
-func (c *RekordboxClient) GetNowPlaying() interfaces.Item {
+func (c *RekordboxClient) GetNowPlaying(collection interfaces.Collection) interfaces.Item {
+	if c.args.StartWith != "" {
+		return c.GetTrackByTitle(c.args.StartWith, collection)
+	}
+
 	songHistories, _ := c.client.RecentDjmdSongHistory(context.Background(), 1)
 	if len(songHistories) == 0 {
 		return nil
@@ -124,25 +145,42 @@ func (c *RekordboxClient) GetCompatibleTracks(track interfaces.Item, from interf
 func (c *RekordboxClient) Run() {
 	collection := c.LoadPlaylist(c.args.Playlist)
 
+	if collection == nil {
+		c.shutdowner.Shutdown(fx.ExitCode(1))
+		return
+	}
+
 	if c.args.Mode == interfaces.ModeSuggest {
 		c.Suggest(collection)
 	} else if c.args.Mode == interfaces.ModeGenerate {
 		c.Generate(collection)
 	}
-	os.Exit(0)
 }
 
 func (c *RekordboxClient) Suggest(collection interfaces.Collection) {
-	track := c.GetNowPlaying()
+	track := c.GetNowPlaying(collection)
+
+	if track == nil {
+		c.shutdowner.Shutdown(fx.ExitCode(1))
+		return
+	}
+
 	fmt.Println(track)
 	compat := c.GetCompatibleTracks(track, collection)
 	compat.ForEach(func(item interfaces.Item) {
 		fmt.Println(" ->", item)
 	})
+	c.shutdowner.Shutdown(fx.ExitCode(0))
 }
 
 func (c *RekordboxClient) Generate(collection interfaces.Collection) {
 	startWith := c.GetTrackByTitle(c.args.StartWith, collection)
+
+	if startWith == nil {
+		c.shutdowner.Shutdown(fx.ExitCode(1))
+		return
+	}
+
 	playlist := models.NewInMemoryCollection(startWith)
 
 	var lastTrack interfaces.Item
@@ -172,6 +210,8 @@ func (c *RekordboxClient) Generate(collection interfaces.Collection) {
 	playlist.ForEach(func(track interfaces.Item) {
 		fmt.Println(track)
 	})
+
+	c.shutdowner.Shutdown(fx.ExitCode(0))
 }
 
 func (c *RekordboxClient) Close() {

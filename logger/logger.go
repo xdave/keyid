@@ -10,10 +10,10 @@ import (
 )
 
 func GetLogger() fx.Option {
-	if !args.CurrentArgs.Debug {
-		return fx.NopLogger
-	}
-	return fx.WithLogger(func() fxevent.Logger {
-		return &fxevent.ConsoleLogger{W: os.Stderr}
+	return fx.WithLogger(func(args *args.Args) fxevent.Logger {
+		if args.Debug {
+			return &fxevent.ConsoleLogger{W: os.Stderr}
+		}
+		return fxevent.NopLogger
 	})
 }
