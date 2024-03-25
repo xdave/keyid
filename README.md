@@ -85,7 +85,7 @@ Usage of ./keyid:
 
 # Do you _really_ use this?
 
-- Yes, [I do](https://soundcloud.com/davidgradwell/sets/gradwell-radio). I used do to do this manually in my head.
+- Yes, [I do](https://soundcloud.com/davidgradwell/sets/gradwell-radio). I used to do this manually in my head.
 
 # Roadmap
 
