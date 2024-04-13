@@ -19,4 +19,5 @@ type Collection interface {
 	FindIndex(predicate func(i Item) bool) int
 	SortWith(comparator func(i, j Item) bool) Collection
 	Items() []Item
+	RandomShuffle()
 }

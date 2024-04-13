@@ -174,7 +174,13 @@ func (c *RekordboxClient) Suggest(collection interfaces.Collection) {
 }
 
 func (c *RekordboxClient) Generate(collection interfaces.Collection) {
-	startWith := c.GetTrackByTitle(c.args.StartWith, collection)
+	crate := models.NewInMemoryCollection(collection.Items()...)
+
+	if c.args.Random {
+		crate.RandomShuffle()
+	}
+
+	startWith := c.GetTrackByTitle(c.args.StartWith, crate)
 
 	if startWith == nil {
 		c.shutdowner.Shutdown(fx.ExitCode(1))
@@ -188,8 +194,8 @@ func (c *RekordboxClient) Generate(collection interfaces.Collection) {
 	for {
 		lastTrack = playlist.Last()
 
-		compatible := c.GetCompatibleTracks(lastTrack, collection)
-		if compatible.IsEmpty() || playlist.Len() == collection.Len() {
+		compatible := c.GetCompatibleTracks(lastTrack, crate)
+		if compatible.IsEmpty() || playlist.Len() == crate.Len() {
 			break
 		}
 		hasCompatibleTrack := false

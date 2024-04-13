@@ -1,9 +1,5 @@
 package main
 
-// #cgo CFLAGS: -I/opt/homebrew/include
-// #cgo LDFLAGS: -L/opt/homebrew/lib
-import "C"
-
 import (
 	"github.com/xdave/keyid/app"
 	"github.com/xdave/keyid/args"

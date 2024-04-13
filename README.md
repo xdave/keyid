@@ -26,6 +26,9 @@ This assumes you have analyzed your collection using the Alphanumeric key notati
 - Install the [command-line tools](https://mac.install.guide/commandlinetools/4)
 - Install [homebrew](https://brew.sh/)
 - Install openssl: `brew install openssl@3`
+  - Then, create symbolic links to the openssl library in `/usr/local`:
+    - `sudo ln -svf /opt/homebrew/include/openssl /usr/local/include/`
+    - `sudo ln -svf /opt/homebrew/lib/libcrypto.* /usr/local/lib/`
 - Install [go 1.22.x](https://go.dev/doc/install)
 
 ## Build
@@ -60,6 +63,8 @@ Usage of ./keyid:
         One of 'suggest' or 'generate' (default "suggest")
   -playlist string
         Name of Rekordbox Playlist to use (uses whole collection by default)
+  -random
+        Randomize playlist before 'generate'
   -startWith string
         Some part of the Track Title to start with in 'generate' mode (otherwise
         starts with first track in provided 'playlist')
@@ -91,7 +96,8 @@ Usage of ./keyid:
 ./keyid -mode generate -playlist 'My Cool Playlist 2024' -startWith 'Cafe Del Mar'
 ```
 
-- NOTE: You must provide a track to start with from your source playlist when in `generate` mode.
+- NOTE: You can provide a track to start with from your source playlist when in `generate` mode.
+- NOTE: Generate mode can randomize the order of the tracks it looks at in the provided playlist, so you can run it multiple times to get a new selection if it doesn't generate something useful (see `-random` flag)
 - NOTE: Track printout has 4 columns, BPM, Key, Energy, and Artist+Title, for example:
   - `122 10A     6       Serious Dancers - In The Beginning (Hernan Cattaneo & Simply City Remix)`
 

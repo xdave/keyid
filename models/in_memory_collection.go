@@ -1,6 +1,7 @@
 package models
 
 import (
+	"math/rand"
 	"slices"
 	"sort"
 
@@ -155,4 +156,10 @@ func (c *InMemoryCollection) SortWith(comparator func(i, j interfaces.Item) bool
 
 func (c *InMemoryCollection) Items() []interfaces.Item {
 	return c.items
+}
+
+func (c *InMemoryCollection) RandomShuffle() {
+	rand.Shuffle(len(c.items), func(i, j int) {
+		c.items[i], c.items[j] = c.items[j], c.items[i]
+	})
 }
