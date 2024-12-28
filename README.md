@@ -19,7 +19,7 @@ This assumes you have analyzed your collection using the Alphanumeric key notati
 - Set the key display format to [Alphanumeric](https://support.pioneerdj.com/hc/en-us/articles/8943219092761-Can-I-change-the-display-format-for-keys)
 - Analyze your tracks. I recommend using [Mixed In Key](https://mixedinkey.com/integration/rekordbox-integration/) (other key detection software makes this program mostly useless because they're almost always wrong)
 
-# Build instructions for macOS (only tested on Sonoma)
+# Build instructions for macOS (only tested on Sonoma & Sequoia)
 
 ## Dependencies
 
