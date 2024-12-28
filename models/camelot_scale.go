@@ -80,6 +80,10 @@ func (key *CamelotScale) IsCompatible(other interfaces.Scale) bool {
 		key.IsEqual(other.Horizontal(1)) ||
 		key.IsEqual(other.Horizontal(-1)) ||
 		key.IsEqual(other.Diagonal()) ||
-		key.IsEqual(other.Vertical()) // ||
-	// key.IsEqual(other.FlatToMinor())
+		key.IsEqual(other.Vertical()) ||
+		key.IsEqual(other.Horizontal(-3)) || // Pay attention -3
+		key.IsEqual(other.Horizontal(+9)) || // Pay attention +9
+		key.IsEqual(other.Horizontal(2)) || // Energy Boost
+		key.IsEqual(other.Horizontal(-5)) || // Jaws mix/Armin Van Buuren variation
+		key.IsEqual(other.FlatToMinor()) // Can't remember where I found this one, lol
 }

@@ -12,4 +12,7 @@ type Item interface {
 	BpmMatchesTarget(targetBpm float64) bool
 	IsCompatible(other Item) bool
 	AsBpm(targetBpm float64) Item
+	GetPath() string
+	GetDateAdded() string
+	GetTags() []string
 }

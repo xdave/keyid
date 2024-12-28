@@ -10,6 +10,7 @@ import (
 	"github.com/xdave/keyid/args"
 	"github.com/xdave/keyid/interfaces"
 	"github.com/xdave/keyid/models"
+	"github.com/xdave/keyid/util"
 
 	"github.com/dvcrn/go-rekordbox/rekordbox"
 	"github.com/mattn/go-nulltype"
@@ -21,6 +22,7 @@ type RekordboxClient struct {
 	optionsResolver *RekordboxOptionsResolver
 	history         *RekordboxHistory
 	args            *args.Args
+	printer         interfaces.Printer
 	shutdowner      fx.Shutdowner
 }
 
@@ -31,6 +33,7 @@ type RekordboxClientParams struct {
 	OptionsResolver *RekordboxOptionsResolver
 	History         *RekordboxHistory
 	Args            *args.Args
+	Printer         interfaces.Printer
 }
 
 type RekordboxClientResult struct {
@@ -51,6 +54,7 @@ func NewRekordboxClient(params RekordboxClientParams) RekordboxClientResult {
 		optionsResolver: params.OptionsResolver,
 		history:         params.History,
 		args:            params.Args,
+		printer:         params.Printer,
 		shutdowner:      params.Shutdowner,
 	}
 
@@ -92,7 +96,9 @@ func (c *RekordboxClient) LoadPlaylist(name string) interfaces.Collection {
 		}
 	}
 
-	return models.NewInMemoryCollection(tracks...)
+	return models.NewInMemoryCollection(tracks...).Filter(func(i interfaces.Item) bool {
+		return strings.Compare(i.GetDateAdded(), c.args.From) > 0
+	})
 }
 
 func (c *RekordboxClient) GetTrackByTitle(pattern string, from interfaces.Collection) interfaces.Item {
@@ -130,6 +136,7 @@ func (c *RekordboxClient) GetNowPlaying(collection interfaces.Collection) interf
 
 func (c *RekordboxClient) GetCompatibleTracks(track interfaces.Item, from interfaces.Collection) interfaces.Collection {
 	compat := models.NewInMemoryCollection()
+	tracks := models.NewInMemoryCollection()
 
 	from.ForEach(func(item interfaces.Item) {
 		if !c.history.Contains(item) {
@@ -138,6 +145,35 @@ func (c *RekordboxClient) GetCompatibleTracks(track interfaces.Item, from interf
 			}
 		}
 	})
+
+	excludeTags := util.StringSlice(strings.Split(c.args.ExcludeTags, ","))
+	tags := util.StringSlice(strings.Split(c.args.Tags, ","))
+
+	if len(tags) > 0 {
+		for _, item := range compat.Items() {
+			itemTags := util.StringSlice(item.GetTags())
+			if itemTags.ContainsAnyOf(tags) {
+				if !tracks.Contains(item) {
+					tracks.Add(item)
+				}
+			}
+		}
+	}
+
+	if len(excludeTags) > 0 {
+		for _, item := range compat.Items() {
+			itemTags := util.StringSlice(item.GetTags())
+			if !itemTags.ContainsAnyOf(excludeTags) {
+				if !tracks.Contains(item) {
+					tracks.Add(item)
+				}
+			}
+		}
+	}
+
+	if len(tracks.Items()) > 0 {
+		return tracks
+	}
 
 	return compat
 }
@@ -190,11 +226,16 @@ func (c *RekordboxClient) Generate(collection interfaces.Collection) {
 	playlist := models.NewInMemoryCollection(startWith)
 
 	var lastTrack interfaces.Item
+	retries := 10
 
-	for {
+	for retries > 0 {
 		lastTrack = playlist.Last()
 
 		compatible := c.GetCompatibleTracks(lastTrack, crate)
+		if c.args.Random {
+			compatible.RandomShuffle()
+		}
+
 		if compatible.IsEmpty() || playlist.Len() == crate.Len() {
 			break
 		}
@@ -205,19 +246,27 @@ func (c *RekordboxClient) Generate(collection interfaces.Collection) {
 			}
 			hasCompatibleTrack = true
 			playlist.Add(track)
+			if c.args.Random {
+				compatible.RandomShuffle()
+			}
 			break
 
 		}
 		if !hasCompatibleTrack {
-			break
+			retries -= 1
+			// break
 		}
 	}
 
-	playlist.ForEach(func(track interfaces.Item) {
-		fmt.Println(track)
-	})
+	c.printer.PrintHeader()
+
+	playlist.ForEach(c.printer.Print)
 
 	c.shutdowner.Shutdown(fx.ExitCode(0))
+
+	if playlist.Len() != crate.Len() {
+		fmt.Fprintln(os.Stderr, "WARNING: expecting", crate.Len(), "tracks, got", playlist.Len())
+	}
 }
 
 func (c *RekordboxClient) Close() {
