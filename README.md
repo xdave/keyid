@@ -107,7 +107,7 @@ Usage of ./keyid:
 
 # Roadmap
 
-- [ ] Generate .m3u playlists in `generate` mode
+- [x] Generate .m3u playlists in `generate` mode
 - [ ] Multiplatform downloadable builds
 - [ ] Support for other DJ Software (Serato, Virtual DJ, Engine DJ, Mixxx, etc)
 - [ ] Better documentation
